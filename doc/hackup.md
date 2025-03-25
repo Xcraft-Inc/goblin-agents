@@ -8,7 +8,7 @@ Se concentrer sur les bases avant d’utiliser des frameworks.
 
 Acquérir les concepts et le vocabulaire essentiels.
 
-Montrer comment les agents peuvent simplifier l’orchestration des LLMs.
+Montrer comment les agents peuvent simplifier l’orchestration des LLMs (use-case dans le logiciel Yeti).
 
 # La théorie
 
@@ -23,7 +23,7 @@ Montrer comment les agents peuvent simplifier l’orchestration des LLMs.
 ## L'oiseau bleu
 
 ```
-Quand je dis l'oiseau vous dite bleu...
+Quand je dis l'oiseau, vous dite bleu...
 ```
 
 ## 🔍 Local vs Cloud – Où tourne un LLM ?
@@ -126,7 +126,7 @@ Description : Llama est une architecture Transformer développée par Meta (anci
 
 Exemples de modèles : Llama-7B, Llama-13B, Llama-30B.
 
-# La pratique
+# Inférer un modèle
 
 ## Monter une infrastructure locale avec Ollama
 
@@ -140,7 +140,7 @@ ollama pull <model de votre choix>
 ollama run mistral-nemo
 ```
 
-## Ollama API
+### Ollama API
 
 [api.md](https://github.com/ollama/ollama/blob/main/docs/api.md)
 
@@ -167,13 +167,13 @@ curl http://localhost:11434/api/embed -d '{
 }'
 ```
 
-## Utiliser une infrastructure cloud
+## Utiliser le Cloud
 
-## OpenAI API
+### OpenAI API
 
 [https://platform.openai.com/docs/api-reference/introduction](https://platform.openai.com/docs/api-reference/introduction)
 
-## Openrouter.ai
+### Openrouter.ai
 
 [https://openrouter.ai/docs/quickstart](https://openrouter.ai/docs/quickstart)
 
@@ -193,6 +193,12 @@ curl https://openrouter.ai/api/v1/chat/completions \
 
 ```
 
+## Utiliser une lib
+
+## Avec llama.cpp
+
+[https://github.com/ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)
+
 # Avec node-llama
 
 [https://node-llama-cpp.withcat.ai/](https://node-llama-cpp.withcat.ai/)
@@ -201,13 +207,75 @@ curl https://openrouter.ai/api/v1/chat/completions \
 npx --no node-llama-cpp inspect gpu
 ```
 
-# Avec Xcraft dans Yeti
+# Intégration de l'IA dans Yeti avec Xcraft
 
-## Agent
+## Xcraft - Le framework maison
+
+[📘 documentation](../../../doc/autogen/xcraft-core-goblin/readme.md)
+
+## Agents - Les agents maison
 
 [🧠 un agent](../../../lib/goblin-agents/lib/llm/yetiAgent.js)
 
 [📘 documentation](../../../doc/autogen/goblin-agents/llm.md)
+
+## Cryo - Le data-layer maison
+
+[📘 documentation](../../../doc/autogen/xcraft-core-goblin/cryo.md)
+
+### Embeddings
+
+```sql
+CREATE VIRTUAL TABLE IF NOT EXISTS embeddings768 USING vec0(
+    documentId TEXT,
+    chunkId TEXT,
+    chunk TEXT,
+    embedding FLOAT[768] distance_metric=cosine
+)
+
+
+SELECT documentId, chunkId, chunk, distance
+      FROM embeddings768
+      WHERE embedding match $vectors
+      ORDER BY distance LIMIT $limit
+```
+
+## Indexeur de contenu
+
+```js
+class ChunkShape {
+  chunk = string;
+  embedding = array;
+}
+
+class MetaShape {
+  index = option(string); //FullTextSearch
+  status = enumeration('published', 'trashed', 'archived');
+  vectors = option(record(string, ChunkShape)); //SQLITE-VEC
+}
+
+class IndexedContentShape {
+  id = id('indexedContent');
+  kind = string;
+  title = string;
+  description = string;
+  contextId = string;
+  sourceId = string;
+  relatedIds = array(string);
+  weight = number;
+  meta = MetaShape;
+}
+```
+
+[🧪 indexeur de contenu](../../../lib/goblin-yennefer/lib/indexer.js)
+
+## Articles wordpress
+
+[📜 ragCresus](../../../lib/goblin-yennefer/lib/prompts/ragCresus.md)
+
+[🧪 processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
+
+[📘 documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
 
 ## Agents de bases
 
@@ -215,21 +283,25 @@ npx --no node-llama-cpp inspect gpu
 
 [📘 documentation de la partie LLM](../../../doc/autogen/goblin-yennefer/llm.md)
 
-## Articles wordpress
-
-[🧪 processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
-
-[📘 documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
-
 ## Générer de la doc
+
+[📜 codeAnalyser](../../../lib/goblin-yennefer/lib/prompts/codeAnalyser.md)
 
 [🧪 générateur de doc](../../../lib/goblin-yennefer/lib/codeMiner.js)
 
 ## Générer un dataset
 
+[📜 qaMinerDatasetBuilder](../../../lib/goblin-yennefer/lib/prompts/qaMinerDatasetBuilder.md)
+
 [🧪 générateur de Question&Answer ](../../../lib/goblin-yennefer/lib/qaMiner.js)
 
-## Analyse de cas
+## Génération de tâches et analyse de cas
+
+[📜 tasksProposalAgent](../../../lib/goblin-yennefer/lib/prompts/tasksProposalAgent.md)
+
+[📜 agentOrchestrator](../../../lib/goblin-yennefer/lib/prompts/agentOrchestrator.md)
+
+[📜 promptGen](../../../lib/goblin-yennefer/lib/prompts/promptGen.md)
 
 [🧪 analyse de cas](../../../lib/goblin-yeti/lib/widgets/case-workitem/service.js)
 
