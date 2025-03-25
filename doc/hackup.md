@@ -1,4 +1,4 @@
-# Hackup Epsitec du 26 mars 2025
+# Hackup du 26 mars 2025 / Samuel Loup
 
 ## 🎯 Objectifs du jour
 
@@ -18,7 +18,7 @@ Montrer comment les agents peuvent simplifier l’orchestration des LLMs (use-ca
 
 ## 🧠 Les LLMs ne comprennent rien, ils imitent des patterns
 
-🔹 Un LLM ne comprend pas ce qu’il dit, il statistiquement imite ce qu’il a appris.
+🔹 Un LLM ne comprend pas ce qu’il dit, il imite statistiquement ce qu’il a appris.
 
 ## L'oiseau bleu
 
@@ -29,8 +29,6 @@ Quand je dis l'oiseau, vous dite bleu...
 ## 🔍 Local vs Cloud – Où tourne un LLM ?
 
 🔹 Un LLM peut être hébergé sur un serveur distant (OpenAI, Claude, Gemini) ou tourné en local sur un PC.
-
-🔹 Vocabulaire : Inférence, quantization, accélération GPU/CPU.
 
 🔑 LLM ≠ API, il y a plusieurs façons de les faire tourner.
 
@@ -89,6 +87,18 @@ La perte de précision est souvent négligeable dans des tâches pratiques, mais
 ## Spécificités
 
 Les modèles **instruct** sont conçus pour suivre des instructions spécifiques, et sont entraînés avec des exemples où l'objectif est de générer des réponses précises et utiles en fonction de ce qui est demandé. Les modèles génératifs classiques, quant à eux, se concentrent plus sur la fluidité de la génération de texte sans forcément respecter des consignes précises.
+
+# Problématique de la taille du contexte et du nombre de tokens
+
+Un token est une unité de texte (mot, morceau de mot ou caractère).
+
+La taille du contexte d’un modèle LLM correspond au nombre maximal de tokens qu’il peut traiter en une seule requête.
+
+Limite de mémoire : Plus le contexte est long, plus il faut de mémoire GPU/CPU pour l'inférence.
+
+Perte d’information : Si le contexte dépasse la limite, l’excès de tokens est tronqué (en général à gauche).
+
+Dégradation des performances : Certains modèles gèrent mal les contextes longs et oublient des infos en début de texte.
 
 # Le format GGUF
 
@@ -312,3 +322,9 @@ class IndexedContentShape {
 [🧪 commander des agents](../../../lib/goblin-yeti/lib/widgets/journal/service.js)
 
 [📘 documentation du journal](../../../doc/autogen/goblin-yeti/journal.md)
+
+# Bonus : extraction et analyse de PDF
+
+```js
+//TODO
+```
