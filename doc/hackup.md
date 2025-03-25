@@ -100,25 +100,25 @@ Il permet d'optimiser la performances computationnelles tout en facilitant le st
 
 # Architectures
 
-Transformer : Architecture de base pour tous les modèles modernes (GPT, BERT, T5, etc.).
+**Transformer** : Architecture de base pour tous les modèles modernes (GPT, BERT, T5, etc.).
 
-BERT : Bidirectionnel, efficace pour la compréhension du langage et les tâches de classification.
+**BERT** : Bidirectionnel, efficace pour la compréhension du langage et les tâches de classification.
 
-GPT : Unidirectionnel, spécialisé dans la génération de texte.
+**GPT** : Unidirectionnel, spécialisé dans la génération de texte.
 
-T5 : Architecture text-to-text, très flexible pour les tâches NLP.
+**T5** : Architecture text-to-text, très flexible pour les tâches NLP.
 
-XLNet : Mélange de BERT et GPT, avec une meilleure gestion des dépendances.
+**XLNet** : Mélange de BERT et GPT, avec une meilleure gestion des dépendances.
 
-BART : Combiné de BERT et GPT, adapté pour des tâches de génération et de résumé.
+**BART** : Combiné de BERT et GPT, adapté pour des tâches de génération et de résumé.
 
-Turing-NLG : Génération de texte de haute qualité et cohérent.
+**Turing-NLG** : Génération de texte de haute qualité et cohérent.
 
-Reformer : Optimisation des Transformers pour les séquences longues.
+**Reformer** : Optimisation des Transformers pour les séquences longues.
 
-Albert : Version légère de BERT, plus rapide et moins gourmande en ressources.
+**Albert** : Version légère de BERT, plus rapide et moins gourmande en ressources.
 
-Llama : Optimisé pour des modèles plus petits avec des performances de haute qualité.
+**Llama** : Optimisé pour des modèles plus petits avec des performances de haute qualité.
 
 ## Llama
 
@@ -162,7 +162,7 @@ curl http://localhost:11434/api/chat -d '{
 
 ```bash
 curl http://localhost:11434/api/embed -d '{
-  "model": "all-minilm",
+  "model": "granite-embedding:278m",
   "input": "Salut Mistral !"
 }'
 ```
@@ -203,36 +203,40 @@ npx --no node-llama-cpp inspect gpu
 
 # Avec Xcraft dans Yeti
 
-## goblin-agents
+## Agent
 
-[acteur agent](../../../lib/goblin-agents/lib/llm/yetiAgent.js)
+[🧠 un agent](../../../lib/goblin-agents/lib/llm/yetiAgent.js)
 
-[documentation](../../../doc/autogen/goblin-agents/llm.md)
+[📘 documentation](../../../doc/autogen/goblin-agents/llm.md)
 
-## goblin-epsilon
+## Agents de bases
+
+[🧠 définition des agents de base](../../../lib/goblin-yennefer/lib/builtInAgents.js)
+
+[📘 documentation de la partie LLM](../../../doc/autogen/goblin-yennefer/llm.md)
+
+## Articles wordpress
 
 [🧪 processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
 
-[documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
+[📘 documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
 
-## goblin-yennefer
+## Générer de la doc
 
-[ 🧪 générateur de doc](../../../lib/goblin-yennefer/lib/codeMiner.js)
+[🧪 générateur de doc](../../../lib/goblin-yennefer/lib/codeMiner.js)
+
+## Générer un dataset
 
 [🧪 générateur de Question&Answer ](../../../lib/goblin-yennefer/lib/qaMiner.js)
 
-[définition des agents de base](../../../lib/goblin-yennefer/lib/builtInAgents.js)
-
-[documentation de la partie LLM](../../../doc/autogen/goblin-yennefer/llm.md)
-
-## goblin-yeti
+## Analyse de cas
 
 [🧪 analyse de cas](../../../lib/goblin-yeti/lib/widgets/case-workitem/service.js)
 
-[documentation du case-workitem](../../../doc/autogen/goblin-yeti/case-workitem.md)
+[📘 documentation du case-workitem](../../../doc/autogen/goblin-yeti/case-workitem.md)
 
-### Dans le journal
+## Dans le journal
 
 [🧪 commander des agents](../../../lib/goblin-yeti/lib/widgets/journal/service.js)
 
-[documentation du journal](../../../doc/autogen/goblin-yeti/journal.md)
+[📘 documentation du journal](../../../doc/autogen/goblin-yeti/journal.md)
