@@ -2,15 +2,13 @@
 
 ## 🎯 Objectifs du jour
 
-1️⃣ Démystifier les LLMs : comprendre sans se perdre dans la complexité.
+Démystifier les LLMs : comprendre sans se perdre dans la complexité.
 
-2️⃣ Infrastructure : moteurs d’inférence et les différents modes d’exécution.
+Se concentrer sur les bases avant d’utiliser des frameworks.
 
-3️⃣ Se concentrer sur les bases avant d’utiliser des frameworks.
+Acquérir les concepts et le vocabulaire essentiels.
 
-4️⃣ Montrer comment les agents peuvent simplifier l’orchestration des LLMs.
-
-5️⃣ Acquérir les concepts et le vocabulaire essentiels.
+Montrer comment les agents peuvent simplifier l’orchestration des LLMs.
 
 # La théorie
 
@@ -195,4 +193,40 @@ curl https://openrouter.ai/api/v1/chat/completions \
 
 ```
 
-# Avec Xcraft et les Elfes
+# Avec node-llama
+
+[https://node-llama-cpp.withcat.ai/](https://node-llama-cpp.withcat.ai/)
+
+```bash
+npx --no node-llama-cpp inspect gpu
+```
+
+# Avec Xcraft dans Yeti
+
+## goblin-agents
+
+[documentation](../../../doc/autogen/goblin-agents/llm.md)
+
+## goblin-epsilon
+
+[processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
+
+[documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
+
+## goblin-yennefer
+
+[définition des agents de base](../../../lib/goblin-yennefer/lib/builtInAgents.js)
+
+[documentation de la partie LLM](../../../doc/autogen/goblin-yennefer/llm.md)
+
+## goblin-yeti
+
+[acteur case-workitem](../../../lib/goblin-yeti/lib/widgets/case-workitem/service.js)
+
+[documentation du case-workitem](../../../doc/autogen/goblin-yeti/case-workitem.md)
+
+### Dans le journal
+
+[acteur journal](../../../lib/goblin-yeti/lib/widgets/journal/service.js)
+
+[documentation du journal](../../../doc/autogen/goblin-yeti/journal.md)
