@@ -205,15 +205,21 @@ npx --no node-llama-cpp inspect gpu
 
 ## goblin-agents
 
+[acteur agent](../../../lib/goblin-agents/lib/llm/yetiAgent.js)
+
 [documentation](../../../doc/autogen/goblin-agents/llm.md)
 
 ## goblin-epsilon
 
-[processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
+[🧪 processus RAG dans wordpress](../../../lib/goblin-epsilon/lib/wordpress/wordpress.js)
 
 [documentation de la partie Wordpress](../../../doc/autogen/goblin-epsilon/wordpress.md)
 
 ## goblin-yennefer
+
+[ 🧪 générateur de doc](../../../lib/goblin-yennefer/lib/codeMiner.js)
+
+[🧪 générateur de Question&Answer ](../../../lib/goblin-yennefer/lib/qaMiner.js)
 
 [définition des agents de base](../../../lib/goblin-yennefer/lib/builtInAgents.js)
 
@@ -221,12 +227,12 @@ npx --no node-llama-cpp inspect gpu
 
 ## goblin-yeti
 
-[acteur case-workitem](../../../lib/goblin-yeti/lib/widgets/case-workitem/service.js)
+[🧪 analyse de cas](../../../lib/goblin-yeti/lib/widgets/case-workitem/service.js)
 
 [documentation du case-workitem](../../../doc/autogen/goblin-yeti/case-workitem.md)
 
 ### Dans le journal
 
-[acteur journal](../../../lib/goblin-yeti/lib/widgets/journal/service.js)
+[🧪 commander des agents](../../../lib/goblin-yeti/lib/widgets/journal/service.js)
 
 [documentation du journal](../../../doc/autogen/goblin-yeti/journal.md)
