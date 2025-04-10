@@ -1,7 +1,7 @@
 {
   "name": "goblin-agents",
   "version": "0.1.0",
-  "description": "Agents framework",
+  "description": "AI Agents framework",
   "author": "Samuel Loup",
   "license": "MIT",
   "config": {
