@@ -3,6 +3,12 @@
 module.exports = [
   {
     type: 'input',
+    name: 'version',
+    message: 'Agents version',
+    default: 2,
+  },
+  {
+    type: 'input',
     name: 'defaultProfile',
     message: 'Agents default profile',
     default: null,
