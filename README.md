@@ -19,6 +19,7 @@ Le module `goblin-agents` permet de créer et gérer des agents IA qui peuvent i
 Les agents peuvent maintenir plusieurs contextes de conversation simultanément, ce qui permet d'avoir des conversations distinctes avec différents utilisateurs ou sur différents sujets. Chaque contexte conserve son propre historique de messages, ce qui permet à l'agent de maintenir la cohérence dans ses réponses.
 
 Le module prend en charge diverses fonctionnalités avancées :
+
 - Génération de texte à partir de prompts
 - Conversations interactives avec historique
 - Extraction de texte à partir d'images de documents PDF
@@ -36,7 +37,7 @@ Les agents peuvent être configurés avec une grande variété d'options qui inf
 const {AiAgent} = require('goblin-agents/lib/llm/aiAgent.js');
 
 // Dans une méthode d'un acteur Elf
-async initAgents() {  
+async initAgents() {
   const feedId = await this.newQuestFeed();
 
   // Création d'un agent avec Ollama (local)
@@ -76,11 +77,11 @@ async initAgents() {
 // Dans une méthode d'un acteur Elf
 async askAgent(desktopId, agentId, contextId, question, saveExchange = false) {
   const feedId = await this.newQuestFeed();
-  
+
   // Instancie l'agent approprié par ex. 'aiAgent@gpt-4o-assistant'
   const agent = await new AiAgent(this).create(agentId, feedId);
- 
-  // Continue la conversation sur ce contexte par ex. 'story-xyz' et 
+
+  // Continue la conversation sur ce contexte par ex. 'story-xyz' et
   // obtient une réponse à la question de l'utilisateur
   const response = await agent.chat(contextId, question, desktopId);
 
@@ -99,7 +100,7 @@ async askAgent(desktopId, agentId, contextId, question, saveExchange = false) {
 // Dans une méthode d'un acteur Elf
 async resumeAndSquashContexte(agentId, contextId) {
   const feedId = await this.newQuestFeed();
-  
+
   // Instancie l'agent approprié par ex. 'aiAgent@gpt-4o-assistant'
   const agent = await new AiAgent(this).create(agentId, feedId);
 
@@ -110,7 +111,7 @@ async resumeAndSquashContexte(agentId, contextId) {
   // Reset la mémoire contextuel et persiste le changement
   await agent.reset(contextId, true);
 
-  // Ajoute un nouvel historique d'échange a partir du résumé 
+  // Ajoute un nouvel historique d'échange a partir du résumé
   await agent.set(contextId, [{role: 'assistant', content: resumedContent}]);
 
   // Sauve ce nouvel état
@@ -125,7 +126,7 @@ async resumeAndSquashContexte(agentId, contextId) {
 // Dans une méthode d'un acteur Elf
 async addWeatherToolSupportToAgent(agentId) {
   const feedId = await this.newQuestFeed();
-  
+
   // Instancie l'agent approprié par ex. 'aiAgent@gpt-4o-assistant'
   const agent = await new AiAgent(this).create(agentId, feedId);
 
@@ -189,9 +190,9 @@ async updateKnowledgeBase(articles) {
   // Générer des embeddings pour plusieurs textes en une seule requête
   const vectorsBatch = await agent.embedInBatch(texts);
 
-  // Upsert les articles dans un archetype IndexedContent 
+  // Upsert les articles dans un archetype IndexedContent
   for(const articleId of articleIds) {
-    // Récupère les vecteurs correspondant au texte dans le lot 
+    // Récupère les vecteurs correspondant au texte dans le lot
     // et le texte original
     const index = articleIds.indexOf(articleId);
     const vectors = vectorsBatch[index];
@@ -252,9 +253,9 @@ async queryKnowledgeBase(question = "Comment fonctionne l'apprentissage par renf
 
 Le module `goblin-agents` interagit avec plusieurs autres composants de l'écosystème Xcraft :
 
-- **xcraft-core-goblin** : Fournit l'infrastructure Elf pour la création d'acteurs
-- **xcraft-core-stones** : Utilisé pour la définition des types de données
-- **xcraft-core-utils** : Utilisé pour les appels API REST et la gestion des verrous
+- **[xcraft-core-goblin]** : Fournit l'infrastructure Elf pour la création d'acteurs
+- **[xcraft-core-stones]** : Utilisé pour la définition des types de données
+- **[xcraft-core-utils]** : Utilisé pour les appels API REST et la gestion des verrous
 
 Le module peut également interagir avec d'autres services Goblin via le système d'appels d'outils, permettant aux agents d'effectuer des actions concrètes dans l'application.
 
@@ -276,6 +277,7 @@ Ce fichier est le point d'entrée du module, exportant les commandes Xcraft pour
 
 Ce fichier définit la configuration du module, permettant de spécifier :
 
+- La version des agents (`version`)
 - Le profil par défaut des agents (`defaultProfile`)
 - Les paramètres par défaut (`defaultSettings`)
 - Les profils pour remplacer les paramètres (`profiles`)
@@ -297,6 +299,7 @@ Ce fichier contient la définition complète de l'acteur AiAgent, avec :
 L'acteur AiAgent offre de nombreuses méthodes pour interagir avec les modèles de langage, gérer les conversations, et utiliser des outils externes. Il prend en charge différentes configurations et options pour personnaliser le comportement des modèles.
 
 Les options de configuration sont particulièrement riches et permettent d'ajuster finement le comportement des modèles, notamment :
+
 - Gestion de la mémoire (NUMA, VRAM)
 - Taille du contexte et traitement par lots
 - Paramètres de génération (température, top_k, top_p)
@@ -328,4 +331,8 @@ Ces utilitaires sont essentiels pour préparer les données avant de les envoyer
 
 Le module inclut également des fonctionnalités spécifiques pour l'OCR (reconnaissance optique de caractères) avec un prompt système dédié (`OCR_SYSTEM_PROMPT`) qui guide les modèles multimodaux dans l'extraction de texte à partir d'images.
 
-*Ce document est une mise à jour de la documentation précédente.*
+_Cette documentation a été mise à jour automatiquement._
+
+[xcraft-core-goblin]: https://github.com/Xcraft-Inc/xcraft-core-goblin
+[xcraft-core-stones]: https://github.com/Xcraft-Inc/xcraft-core-stones
+[xcraft-core-utils]: https://github.com/Xcraft-Inc/xcraft-core-utils
