@@ -73,7 +73,6 @@ async initAgents() {
 ### Conversation avec un agent
 
 ```javascript
-
 // Dans une méthode d'un acteur Elf
 async askAgent(desktopId, agentId, contextId, question, saveExchange = false) {
   const feedId = await this.newQuestFeed();
@@ -96,7 +95,6 @@ async askAgent(desktopId, agentId, contextId, question, saveExchange = false) {
 ### Résumer et "squasher" un contexte
 
 ```javascript
-
 // Dans une méthode d'un acteur Elf
 async resumeAndSquashContexte(agentId, contextId) {
   const feedId = await this.newQuestFeed();
@@ -122,7 +120,6 @@ async resumeAndSquashContexte(agentId, contextId) {
 ### Utilisation d'outils externes
 
 ```javascript
-
 // Dans une méthode d'un acteur Elf
 async addWeatherToolSupportToAgent(agentId) {
   const feedId = await this.newQuestFeed();
@@ -161,13 +158,11 @@ async addWeatherToolSupportToAgent(agentId) {
 // L'agent pourra maintenant utiliser l'outil weather.getWeather
 const question = "Quel temps fait-il à Paris aujourd'hui?";
 const response = await agent.chat(contextId, question, desktopId);
-
 ```
 
 ### Génération d'embeddings pour la recherche sémantique
 
 ```javascript
-
 // Dans une méthode d'un acteur Elf
 // {
 //  'indexContent@article-1', 'Contenu à indexer'
@@ -261,11 +256,13 @@ Le module peut également interagir avec d'autres services Goblin via le systèm
 
 ## Configuration avancée
 
-- **version** : Version des agents (par défaut: 2)
-- **defaultProfile** : Profil par défaut des agents (par défaut: null)
-- **defaultSettings** : Paramètres par défaut (par défaut: null)
-- **profiles** : Profils pour remplacer les paramètres (par défaut: {})
-- **settings** : Paramètres par nom (par défaut: {})
+| Option | Description | Type | Valeur par défaut |
+|--------|-------------|------|------------------|
+| version | Version des agents | Number | 2 |
+| defaultProfile | Profil par défaut des agents | String | null |
+| defaultSettings | Paramètres par défaut | Object | null |
+| profiles | Profils pour remplacer les paramètres | Object | {} |
+| settings | Paramètres par nom | Object | {} |
 
 ## Détails des sources
 
@@ -296,15 +293,53 @@ Ce fichier contient la définition complète de l'acteur AiAgent, avec :
 - **AiAgentLogic** : Logique métier de l'agent (mutations d'état)
 - **AiAgent** : Classe principale de l'acteur avec les méthodes d'interaction
 
-L'acteur AiAgent offre de nombreuses méthodes pour interagir avec les modèles de langage, gérer les conversations, et utiliser des outils externes. Il prend en charge différentes configurations et options pour personnaliser le comportement des modèles.
+#### État et modèle de données
 
-Les options de configuration sont particulièrement riches et permettent d'ajuster finement le comportement des modèles, notamment :
+L'état d'un agent IA est défini par la classe `AiAgentShape` qui contient les propriétés suivantes :
 
-- Gestion de la mémoire (NUMA, VRAM)
-- Taille du contexte et traitement par lots
-- Paramètres de génération (température, top_k, top_p)
-- Pénalités pour éviter les répétitions
-- Algorithmes adaptatifs comme Mirostat
+- `id` : Identifiant unique de l'agent
+- `version` : Version de l'agent
+- `name` : Nom de l'agent
+- `role` : Rôle de l'agent (assistant, etc.)
+- `prompt` : Prompt par défaut utilisé pour définir le comportement de l'agent
+- `provider` : Fournisseur LLM ('ollama' ou 'open-ai')
+- `model` : Modèle de langage utilisé
+- `host` : URL du serveur LLM
+- `headers` : En-têtes HTTP pour les requêtes API
+- `messages` : Historique des messages par contexte
+- `options` : Options de configuration du modèle
+- `format` : Format de sortie attendu
+- `tools` : Outils externes disponibles pour l'agent
+- `toolServiceId` : Identifiant du service d'outils
+- `usability` : État d'utilisabilité ('disabled', 'experimental', 'stable', 'deprecated')
+- `meta` : Métadonnées de l'agent
+
+#### Méthodes publiques
+
+- **`create(id, desktopId, agentState)`** - Crée un nouvel agent avec l'ID et l'état spécifiés.
+- **`patch(agentState)`** - Met à jour l'état de l'agent avec les propriétés fournies.
+- **`upgrade(version, agentState)`** - Met à niveau l'agent vers une nouvelle version avec l'état spécifié.
+- **`gen(prompt)`** - Génère du texte à partir d'un prompt.
+- **`reset(contextId, save)`** - Réinitialise l'historique des messages pour un contexte spécifique.
+- **`readPDFpages(pdfPath)`** - Extrait le texte des pages d'un document PDF.
+- **`embed(rawText)`** - Génère un embedding vectoriel pour un texte donné.
+- **`embedInBatch(rawTexts)`** - Génère des embeddings vectoriels pour plusieurs textes en une seule requête.
+- **`set(contextId, messages)`** - Définit l'historique des messages pour un contexte spécifique.
+- **`chat(contextId, question, userDesktopId, sessionId)`** - Engage une conversation avec l'agent dans un contexte spécifique.
+- **`callTools(contextId, message, userDesktopId, sessionId)`** - Appelle des outils externes en fonction des demandes de l'agent.
+- **`addToolMessage(contextId, toolId, toolName, answer)`** - Ajoute une réponse d'outil à l'historique des messages.
+- **`ask(contextId, question, questionId)`** - Pose une question à l'agent avec streaming de la réponse.
+- **`resumeExchange(resumePrompt, contextId)`** - Résume un échange de conversation.
+- **`react(reactPrompt, contextId, question)`** - Utilise le paradigme ReAct pour raisonner et agir sur une question.
+- **`callAgent(contextId, agentId, action, feedId)`** - Appelle un autre agent pour effectuer une action.
+- **`addAssistantMessage(contextId, message)`** - Ajoute un message de l'assistant à l'historique.
+- **`save()`** - Persiste l'état de l'agent.
+- **`change(path, newValue)`** - Modifie une propriété spécifique de l'état de l'agent.
+- **`getUserChatContextHistory(contextId, filterTool)`** - Récupère l'historique des messages pour un contexte spécifique.
+- **`getBaseSettings()`** - Récupère les paramètres de base de l'agent.
+- **`getUsability()`** - Récupère l'état d'utilisabilité de l'agent.
+- **`trash()`** - Marque l'agent comme supprimé.
+- **`delete()`** - Supprime l'agent.
 
 ### `lib/llm/providers.js`
 
