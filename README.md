@@ -4,6 +4,15 @@
 
 Le module `goblin-agents` fournit une infrastructure complète pour intégrer des agents d'intelligence artificielle (IA) dans l'écosystème Xcraft. Il permet de créer, configurer et interagir avec différents modèles de langage (LLM) via des fournisseurs comme Ollama et OpenAI. Ce module est conçu pour faciliter l'utilisation d'agents IA dans diverses applications, en offrant des fonctionnalités avancées comme la gestion de conversations, l'analyse de documents PDF, et l'utilisation d'outils externes.
 
+## Sommaire
+
+- [Structure du module](#structure-du-module)
+- [Fonctionnement global](#fonctionnement-global)
+- [Exemples d'utilisation](#exemples-dutilisation)
+- [Interactions avec d'autres modules](#interactions-avec-dautres-modules)
+- [Configuration avancée](#configuration-avancée)
+- [Détails des sources](#détails-des-sources)
+
 ## Structure du module
 
 - **AiAgent** : Acteur principal qui encapsule un agent IA et ses fonctionnalités
@@ -41,7 +50,7 @@ async initAgents() {
   const feedId = await this.newQuestFeed();
 
   // Création d'un agent avec Ollama (local)
-  const ollamaAgentId = SmartId.from('aiAgent', 'ollama-mistral-assistant');
+  const ollamaAgentId = 'aiAgent@ollama-mistral-assistant';
   const agent = await new AiAgent(this).create(ollamaAgentId, feedId, {
     name: 'Assistant Personnel',
     role: 'assistant',
@@ -56,8 +65,8 @@ async initAgents() {
   });
 
   // Création d'un agent avec OpenAI (cloud)
-  const openAiAgentId = SmartId.from('aiAgent', 'gpt-4o-assistant');
-  const agent = await new AiAgent(this).create(openAiAgentId, feedId, {
+  const openAiAgentId = 'aiAgent@gpt-4o-assistant';
+  const cloudAgent = await new AiAgent(this).create(openAiAgentId, feedId, {
     name: 'Assistant Personnel',
     role: 'assistant',
     provider: 'open-ai',
@@ -68,6 +77,7 @@ async initAgents() {
     },
     usability: 'stable'
   });
+}
 ```
 
 ### Conversation avec un agent
@@ -89,31 +99,6 @@ async askAgent(desktopId, agentId, contextId, question, saveExchange = false) {
     await agent.save();
   }
   return response;
-}
-```
-
-### Résumer et "squasher" un contexte
-
-```javascript
-// Dans une méthode d'un acteur Elf
-async resumeAndSquashContexte(agentId, contextId) {
-  const feedId = await this.newQuestFeed();
-
-  // Instancie l'agent approprié par ex. 'aiAgent@gpt-4o-assistant'
-  const agent = await new AiAgent(this).create(agentId, feedId);
-
-  // Demande un résumé des échanges
-  const resumePrompt = "Résume l'essentiel de nos échanges en utilisant l'historique des messages";
-  const resumedContent = await agent.resumeExchange(resumePrompt, contextId);
-
-  // Reset la mémoire contextuel et persiste le changement
-  await agent.reset(contextId, true);
-
-  // Ajoute un nouvel historique d'échange a partir du résumé
-  await agent.set(contextId, [{role: 'assistant', content: resumedContent}]);
-
-  // Sauve ce nouvel état
-  await agent.save();
 }
 ```
 
@@ -152,23 +137,17 @@ async addWeatherToolSupportToAgent(agentId) {
       }
     ]
   });
+
+  // L'agent pourra maintenant utiliser l'outil weather.getWeather
+  const question = "Quel temps fait-il à Paris aujourd'hui?";
+  const response = await agent.chat(contextId, question, desktopId);
 }
-
-
-// L'agent pourra maintenant utiliser l'outil weather.getWeather
-const question = "Quel temps fait-il à Paris aujourd'hui?";
-const response = await agent.chat(contextId, question, desktopId);
 ```
 
 ### Génération d'embeddings pour la recherche sémantique
 
 ```javascript
 // Dans une méthode d'un acteur Elf
-// {
-//  'indexContent@article-1', 'Contenu à indexer'
-//  'indexContent@article-2', 'Un autre contenu à indexer'
-// }
-//
 async updateKnowledgeBase(articles) {
   const feedId = await this.newQuestFeed();
 
@@ -212,36 +191,6 @@ async updateKnowledgeBase(articles) {
     );
   }
 }
-
-// Dans une méthode d'un acteur Elf
-async queryKnowledgeBase(question = "Comment fonctionne l'apprentissage par renforcement?") {
-  const feedId = await this.newQuestFeed();
-
-  // Instancie l'agent approprié pour faire un embedding
-  // par ex. 'aiAgent@default-embedder'
-  const agent = await new AiAgent(this).create(agentId, feedId);
-
-  // Générer un embedding pour un texte, par ex. pour une recherche
-  // Convertit la question texte en vecteurs
-  const vectors = await agent.embed(question);
-
-  // Effectue une recherche par similitude dans cryo
-  // Utilise un Archetype "IndexedContent"
-  // Limite la recherche au contenu indexé en français
-  // avec un scope 'knowledge-base'
-  // les 100 premier résultats les plus pertinents
-  const results = await this.cryo.searchDistance2(
-    IndexedContentLogic.db,
-    vectors,
-    ['fr'],
-    ['knowledge-base'],
-    100
-  );
-
-  // Itère sur les données et retourne les résultats
-  // a l'appelant
-  return Array.from(results);
-}
 ```
 
 ## Interactions avec d'autres modules
@@ -251,24 +200,25 @@ Le module `goblin-agents` interagit avec plusieurs autres composants de l'écosy
 - **[xcraft-core-goblin]** : Fournit l'infrastructure Elf pour la création d'acteurs
 - **[xcraft-core-stones]** : Utilisé pour la définition des types de données
 - **[xcraft-core-utils]** : Utilisé pour les appels API REST et la gestion des verrous
+- **[xcraft-core-etc]** : Utilisé pour la gestion de la configuration du module
 
 Le module peut également interagir avec d'autres services Goblin via le système d'appels d'outils, permettant aux agents d'effectuer des actions concrètes dans l'application.
 
 ## Configuration avancée
 
-| Option | Description | Type | Valeur par défaut |
-|--------|-------------|------|------------------|
-| version | Version des agents | Number | 2 |
-| defaultProfile | Profil par défaut des agents | String | null |
-| defaultSettings | Paramètres par défaut | Object | null |
-| profiles | Profils pour remplacer les paramètres | Object | {} |
-| settings | Paramètres par nom | Object | {} |
+| Option          | Description                           | Type   | Valeur par défaut |
+| --------------- | ------------------------------------- | ------ | ----------------- |
+| version         | Version des agents                    | Number | 2                 |
+| defaultProfile  | Profil par défaut des agents          | String | null              |
+| defaultSettings | Paramètres par défaut                 | Object | null              |
+| profiles        | Profils pour remplacer les paramètres | Object | {}                |
+| settings        | Paramètres par nom                    | Object | {}                |
 
 ## Détails des sources
 
 ### `aiAgent.js`
 
-Ce fichier est le point d'entrée du module, exportant les commandes Xcraft pour l'acteur AiAgent. Il importe l'acteur et sa logique depuis le fichier principal et les expose au système Xcraft.
+Ce fichier est le point d'entrée du module, exportant les commandes Xcraft pour l'acteur AiAgent. Il importe l'acteur et sa logique depuis le fichier principal et les expose au système Xcraft via `Elf.birth()`.
 
 ### `config.js`
 
@@ -307,67 +257,147 @@ L'état d'un agent IA est défini par la classe `AiAgentShape` qui contient les 
 - `host` : URL du serveur LLM
 - `headers` : En-têtes HTTP pour les requêtes API
 - `messages` : Historique des messages par contexte
-- `options` : Options de configuration du modèle
+- `options` : Options de configuration du modèle (voir OptionsShape)
 - `format` : Format de sortie attendu
 - `tools` : Outils externes disponibles pour l'agent
 - `toolServiceId` : Identifiant du service d'outils
 - `usability` : État d'utilisabilité ('disabled', 'experimental', 'stable', 'deprecated')
 - `meta` : Métadonnées de l'agent
 
+La classe `OptionsShape` définit de nombreuses options de configuration pour les modèles LLM, incluant des paramètres comme la température, la taille du contexte, les pénalités de répétition, et les options d'optimisation mémoire.
+
+#### Cycle de vie de l'acteur
+
+L'acteur AiAgent suit le cycle de vie standard des acteurs Elf Archetype :
+
+1. **Création** : Via la méthode `create()` qui initialise l'agent avec un ID et un état
+2. **Configuration** : Via `patch()` pour modifier les paramètres ou `upgrade()` pour les mises à jour de version
+3. **Utilisation** : Via les méthodes de conversation et de génération
+4. **Persistance** : Via `save()` pour sauvegarder l'état
+5. **Suppression** : Via `trash()` pour marquer comme supprimé ou `delete()` pour suppression définitive
+
 #### Méthodes publiques
 
-- **`create(id, desktopId, agentState)`** - Crée un nouvel agent avec l'ID et l'état spécifiés.
-- **`patch(agentState)`** - Met à jour l'état de l'agent avec les propriétés fournies.
-- **`upgrade(version, agentState)`** - Met à niveau l'agent vers une nouvelle version avec l'état spécifié.
-- **`gen(prompt)`** - Génère du texte à partir d'un prompt.
-- **`reset(contextId, save)`** - Réinitialise l'historique des messages pour un contexte spécifique.
-- **`readPDFpages(pdfPath)`** - Extrait le texte des pages d'un document PDF.
-- **`embed(rawText)`** - Génère un embedding vectoriel pour un texte donné.
-- **`embedInBatch(rawTexts)`** - Génère des embeddings vectoriels pour plusieurs textes en une seule requête.
-- **`set(contextId, messages)`** - Définit l'historique des messages pour un contexte spécifique.
-- **`chat(contextId, question, userDesktopId, sessionId)`** - Engage une conversation avec l'agent dans un contexte spécifique.
-- **`callTools(contextId, message, userDesktopId, sessionId)`** - Appelle des outils externes en fonction des demandes de l'agent.
-- **`addToolMessage(contextId, toolId, toolName, answer)`** - Ajoute une réponse d'outil à l'historique des messages.
-- **`ask(contextId, question, questionId)`** - Pose une question à l'agent avec streaming de la réponse.
-- **`resumeExchange(resumePrompt, contextId)`** - Résume un échange de conversation.
-- **`react(reactPrompt, contextId, question)`** - Utilise le paradigme ReAct pour raisonner et agir sur une question.
-- **`callAgent(contextId, agentId, action, feedId)`** - Appelle un autre agent pour effectuer une action.
-- **`addAssistantMessage(contextId, message)`** - Ajoute un message de l'assistant à l'historique.
-- **`save()`** - Persiste l'état de l'agent.
-- **`change(path, newValue)`** - Modifie une propriété spécifique de l'état de l'agent.
-- **`getUserChatContextHistory(contextId, filterTool)`** - Récupère l'historique des messages pour un contexte spécifique.
-- **`getBaseSettings()`** - Récupère les paramètres de base de l'agent.
-- **`getUsability()`** - Récupère l'état d'utilisabilité de l'agent.
-- **`trash()`** - Marque l'agent comme supprimé.
-- **`delete()`** - Supprime l'agent.
+**`create(id, desktopId, agentState)`** - Crée un nouvel agent avec l'ID et l'état spécifiés. Persiste automatiquement l'agent après création.
+
+**`patch(agentState)`** - Met à jour l'état de l'agent avec les propriétés fournies et persiste les changements.
+
+**`upgrade(version, agentState)`** - Met à niveau l'agent vers une nouvelle version avec l'état spécifié, uniquement si la version est supérieure à la version actuelle.
+
+**`gen(prompt)`** - Génère du texte à partir d'un prompt en utilisant le modèle configuré de l'agent.
+
+**`reset(contextId, save)`** - Réinitialise l'historique des messages pour un contexte spécifique. Si aucun contextId n'est fourni, réinitialise tous les contextes.
+
+**`readPDFpages(pdfPath)`** - Extrait le texte des pages d'un document PDF en utilisant l'OCR via un modèle multimodal.
+
+**`embed(rawText)`** - Génère un embedding vectoriel pour un texte donné, retourné sous forme de littéral SQL hexadécimal.
+
+**`embedInBatch(rawTexts)`** - Génère des embeddings vectoriels pour plusieurs textes en une seule requête, optimisé pour les traitements par lots.
+
+**`set(contextId, messages)`** - Définit directement l'historique des messages pour un contexte spécifique.
+
+**`chat(contextId, question, userDesktopId, sessionId)`** - Engage une conversation avec l'agent dans un contexte spécifique. Gère automatiquement l'historique et les appels d'outils.
+
+**`ask(contextId, question, questionId)`** - Pose une question à l'agent avec streaming de la réponse (uniquement pour Ollama). Émet des événements pour chaque partie de la réponse.
+
+**`resumeExchange(resumePrompt, contextId)`** - Reprend un échange existant avec un nouveau prompt système, en utilisant l'historique du contexte comme base.
+
+**`react(reactPrompt, contextId, question)`** - Utilise le paradigme ReAct (Reasoning and Acting) pour permettre à l'agent de raisonner et d'agir de manière autonome.
+
+**`callAgent(contextId, agentId, action, feedId)`** - Appelle un autre agent pour effectuer une action spécifique dans le cadre d'une orchestration multi-agents.
+
+**`addAssistantMessage(contextId, message)`** - Ajoute un message de l'assistant à l'historique d'un contexte spécifique.
+
+**`change(path, newValue)`** - Modifie une propriété spécifique de l'état de l'agent avec gestion automatique des types pour certains paramètres.
+
+**`getUserChatContextHistory(contextId, filterTool)`** - Récupère l'historique des messages pour un contexte spécifique avec option de filtrage des messages d'outils.
+
+**`getBaseSettings()`** - Retourne les paramètres de base de l'agent (provider, host, headers, model).
+
+**`getUsability()`** - Retourne l'état d'utilisabilité de l'agent.
+
+**`trash()`** - Marque l'agent comme supprimé en changeant son statut meta à 'trashed'.
+
+**`save()`** - Persiste l'état actuel de l'agent sur le disque.
 
 ### `lib/llm/providers.js`
 
-Ce fichier définit les classes pour interagir avec différents fournisseurs de LLM :
+Ce fichier définit l'architecture des fournisseurs de LLM avec une classe abstraite `LLMProvider` et ses implémentations concrètes :
 
-- **LLMProvider** : Classe abstraite définissant l'interface commune
-- **OllamaProvider** : Implémentation pour le fournisseur Ollama (local)
-- **OpenAIProvider** : Implémentation pour OpenAI et services compatibles
+#### LLMProvider (classe abstraite)
 
-Ces classes encapsulent les détails d'implémentation spécifiques à chaque fournisseur, offrant une interface unifiée pour le reste du module. Elles gèrent les différences dans les formats de requête et de réponse, permettant à l'acteur AiAgent de fonctionner de manière transparente avec différents fournisseurs.
+Définit l'interface commune que tous les fournisseurs doivent implémenter :
+
+- `chat()` : Conversation avec le modèle
+- `gen()` : Génération de texte
+- `embed()` : Génération d'embeddings
+- `embedInBatch()` : Génération d'embeddings par lots
+
+#### OllamaProvider
+
+Implémentation pour le fournisseur Ollama (serveur local) :
+
+- Utilise la bibliothèque `ollama` pour communiquer avec le serveur
+- Gère le streaming pour les conversations en temps réel
+- Implémente un sémaphore pour limiter les requêtes d'embedding simultanées (max 4)
+- Supporte tous les formats de sortie JSON structurés
+
+#### OpenAIProvider
+
+Implémentation pour OpenAI et services compatibles (OpenRouter, etc.) :
+
+- Utilise `RestAPI` de xcraft-core-utils pour les appels HTTP
+- Adapte les formats de requête entre Ollama et OpenAI
+- Gère les schémas JSON pour les réponses structurées
+- Supporte les en-têtes d'authentification personnalisés
 
 ### `lib/llm/utils.js`
 
-Ce fichier contient diverses fonctions utilitaires pour :
+Ce fichier contient un ensemble complet d'utilitaires pour le traitement de texte et de documents :
 
-- Extraction de texte à partir d'images PDF (`getPDFImages`)
-- Nettoyage et simplification de contenu HTML (`cleanHtmlContent`, `simplifyHtml`)
-- Découpage de texte en segments gérables (`splitLongText`, `html2chunks`)
-- Estimation du nombre de tokens (`estimateTokenCount`)
-- Construction de prompts à partir d'articles (`buildPromptFromArticles`)
-- Traitement par lots des embeddings (`embedChunksInBatch`, `chunkArray`)
+#### Traitement de documents PDF
 
-Ces utilitaires sont essentiels pour préparer les données avant de les envoyer aux modèles de langage et pour traiter les résultats. Ils permettent notamment de gérer les contraintes de taille de contexte des modèles en découpant intelligemment les textes longs.
+**`getPDFImages(pdfPath)`** - Convertit les pages d'un PDF en images base64 pour l'OCR avec des options optimisées pour la qualité du texte.
 
-Le module inclut également des fonctionnalités spécifiques pour l'OCR (reconnaissance optique de caractères) avec un prompt système dédié (`OCR_SYSTEM_PROMPT`) qui guide les modèles multimodaux dans l'extraction de texte à partir d'images.
+**`OCR_SYSTEM_PROMPT`** - Prompt système spécialisé pour guider les modèles multimodaux dans l'extraction de texte à partir d'images.
+
+#### Traitement de texte et HTML
+
+**`cleanHtmlContent(html)`** - Nettoie le contenu HTML en supprimant les balises et en normalisant les espaces.
+
+**`simplifyHtml(html)`** - Simplifie le HTML en gardant uniquement les éléments sûrs via sanitize-html.
+
+**`extractTitlesAndContent(html)`** - Extrait intelligemment les titres et le contenu d'un document HTML en préservant la structure.
+
+**`html2chunks(html, chunkSize, chunkOverlap)`** - Découpe un document HTML en chunks en utilisant RecursiveCharacterTextSplitter de LangChain.
+
+#### Gestion des tokens et découpage
+
+**`estimateTokenCount(text)`** - Estime le nombre de tokens d'un texte (approximation basée sur les mots × 1.33).
+
+**`splitLongText(text, maxLength, baseId)`** - Découpe un texte long en segments de taille maximale en préservant les mots entiers.
+
+**`sliceText(text, chunkSize)`** - Découpe un texte en chunks en respectant les limites de phrases.
+
+**`groupSentences(text, maxSize)`** - Groupe les phrases en chunks de taille optimale pour les modèles de langage.
+
+#### Traitement par lots et optimisation
+
+**`chunkArray(array, size)`** - Divise un tableau en sous-tableaux de taille spécifiée pour le traitement par lots.
+
+**`embedChunksInBatch(agent, allChunks, batchSize)`** - Traite les embeddings par lots en associant chaque embedding à son contenu d'origine.
+
+**`buildPromptFromArticlesMulti(initialQuestion, questionsWithArticles, maxTotalTokens)`** - Construit des prompts optimisés à partir de multiples articles en respectant les limites de tokens.
+
+#### Utilitaires de conversion
+
+**`vectorToSqlLiteral(vec)`** - Convertit un vecteur Float32Array en littéral SQL hexadécimal pour le stockage en base de données.
+
+Ces utilitaires sont essentiels pour préparer les données avant de les envoyer aux modèles de langage et pour traiter les résultats. Ils permettent notamment de gérer les contraintes de taille de contexte des modèles en découpant intelligemment les textes longs tout en préservant la cohérence sémantique.
 
 _Cette documentation a été mise à jour automatiquement._
 
 [xcraft-core-goblin]: https://github.com/Xcraft-Inc/xcraft-core-goblin
 [xcraft-core-stones]: https://github.com/Xcraft-Inc/xcraft-core-stones
 [xcraft-core-utils]: https://github.com/Xcraft-Inc/xcraft-core-utils
+[xcraft-core-etc]: https://github.com/Xcraft-Inc/xcraft-core-etc
