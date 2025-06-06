@@ -220,18 +220,6 @@ Le module peut également interagir avec d'autres services Goblin via le systèm
 
 Ce fichier est le point d'entrée du module, exportant les commandes Xcraft pour l'acteur AiAgent. Il importe l'acteur et sa logique depuis le fichier principal et les expose au système Xcraft via `Elf.birth()`.
 
-### `config.js`
-
-Ce fichier définit la configuration du module, permettant de spécifier :
-
-- La version des agents (`version`)
-- Le profil par défaut des agents (`defaultProfile`)
-- Les paramètres par défaut (`defaultSettings`)
-- Les profils pour remplacer les paramètres (`profiles`)
-- Les paramètres par nom (`settings`)
-
-Cette configuration permet de personnaliser le comportement des agents au niveau de l'application.
-
 ### `lib/llm/aiAgent.js`
 
 Ce fichier contient la définition complète de l'acteur AiAgent, avec :
@@ -278,47 +266,27 @@ L'acteur AiAgent suit le cycle de vie standard des acteurs Elf Archetype :
 
 #### Méthodes publiques
 
-**`create(id, desktopId, agentState)`** - Crée un nouvel agent avec l'ID et l'état spécifiés. Persiste automatiquement l'agent après création.
-
-**`patch(agentState)`** - Met à jour l'état de l'agent avec les propriétés fournies et persiste les changements.
-
-**`upgrade(version, agentState)`** - Met à niveau l'agent vers une nouvelle version avec l'état spécifié, uniquement si la version est supérieure à la version actuelle.
-
-**`gen(prompt)`** - Génère du texte à partir d'un prompt en utilisant le modèle configuré de l'agent.
-
-**`reset(contextId, save)`** - Réinitialise l'historique des messages pour un contexte spécifique. Si aucun contextId n'est fourni, réinitialise tous les contextes.
-
-**`readPDFpages(pdfPath)`** - Extrait le texte des pages d'un document PDF en utilisant l'OCR via un modèle multimodal.
-
-**`embed(rawText)`** - Génère un embedding vectoriel pour un texte donné, retourné sous forme de littéral SQL hexadécimal.
-
-**`embedInBatch(rawTexts)`** - Génère des embeddings vectoriels pour plusieurs textes en une seule requête, optimisé pour les traitements par lots.
-
-**`set(contextId, messages)`** - Définit directement l'historique des messages pour un contexte spécifique.
-
-**`chat(contextId, question, userDesktopId, sessionId)`** - Engage une conversation avec l'agent dans un contexte spécifique. Gère automatiquement l'historique et les appels d'outils.
-
-**`ask(contextId, question, questionId)`** - Pose une question à l'agent avec streaming de la réponse (uniquement pour Ollama). Émet des événements pour chaque partie de la réponse.
-
-**`resumeExchange(resumePrompt, contextId)`** - Reprend un échange existant avec un nouveau prompt système, en utilisant l'historique du contexte comme base.
-
-**`react(reactPrompt, contextId, question)`** - Utilise le paradigme ReAct (Reasoning and Acting) pour permettre à l'agent de raisonner et d'agir de manière autonome.
-
-**`callAgent(contextId, agentId, action, feedId)`** - Appelle un autre agent pour effectuer une action spécifique dans le cadre d'une orchestration multi-agents.
-
-**`addAssistantMessage(contextId, message)`** - Ajoute un message de l'assistant à l'historique d'un contexte spécifique.
-
-**`change(path, newValue)`** - Modifie une propriété spécifique de l'état de l'agent avec gestion automatique des types pour certains paramètres.
-
-**`getUserChatContextHistory(contextId, filterTool)`** - Récupère l'historique des messages pour un contexte spécifique avec option de filtrage des messages d'outils.
-
-**`getBaseSettings()`** - Retourne les paramètres de base de l'agent (provider, host, headers, model).
-
-**`getUsability()`** - Retourne l'état d'utilisabilité de l'agent.
-
-**`trash()`** - Marque l'agent comme supprimé en changeant son statut meta à 'trashed'.
-
-**`save()`** - Persiste l'état actuel de l'agent sur le disque.
+- **`create(id, desktopId, agentState)`** — Crée un nouvel agent avec l'ID et l'état spécifiés. Persiste automatiquement l'agent après création.
+- **`patch(agentState)`** — Met à jour l'état de l'agent avec les propriétés fournies et persiste les changements.
+- **`upgrade(version, agentState)`** — Met à niveau l'agent vers une nouvelle version avec l'état spécifié, uniquement si la version est supérieure à la version actuelle.
+- **`gen(prompt)`** — Génère du texte à partir d'un prompt en utilisant le modèle configuré de l'agent.
+- **`reset(contextId, save=false)`** — Réinitialise l'historique des messages pour un contexte spécifique. Si aucun contextId n'est fourni, réinitialise tous les contextes.
+- **`readPDFpages(pdfPath)`** — Extrait le texte des pages d'un document PDF en utilisant l'OCR via un modèle multimodal.
+- **`embed(rawText)`** — Génère un embedding vectoriel pour un texte donné, retourné sous forme de littéral SQL hexadécimal.
+- **`embedInBatch(rawTexts=[])`** — Génère des embeddings vectoriels pour plusieurs textes en une seule requête, optimisé pour les traitements par lots avec gestion des verrous.
+- **`set(contextId, messages)`** — Définit directement l'historique des messages pour un contexte spécifique.
+- **`chat(contextId, question, userDesktopId, sessionId=null)`** — Engage une conversation avec l'agent dans un contexte spécifique. Gère automatiquement l'historique et les appels d'outils.
+- **`ask(contextId, question, questionId)`** — Pose une question à l'agent avec streaming de la réponse (uniquement pour Ollama). Émet des événements pour chaque partie de la réponse.
+- **`resumeExchange(resumePrompt, contextId)`** — Reprend un échange existant avec un nouveau prompt système, en utilisant l'historique du contexte comme base.
+- **`react(reactPrompt, contextId, question)`** — Utilise le paradigme ReAct (Reasoning and Acting) pour permettre à l'agent de raisonner et d'agir de manière autonome.
+- **`callAgent(contextId, agentId, action, feedId)`** — Appelle un autre agent pour effectuer une action spécifique dans le cadre d'une orchestration multi-agents.
+- **`addAssistantMessage(contextId, message)`** — Ajoute un message de l'assistant à l'historique d'un contexte spécifique.
+- **`change(path, newValue)`** — Modifie une propriété spécifique de l'état de l'agent avec gestion automatique des types pour certains paramètres.
+- **`getUserChatContextHistory(contextId, filterTool=true)`** — Récupère l'historique des messages pour un contexte spécifique avec option de filtrage des messages d'outils.
+- **`getBaseSettings()`** — Retourne les paramètres de base de l'agent (provider, host, headers, model).
+- **`getUsability()`** — Retourne l'état d'utilisabilité de l'agent.
+- **`trash()`** — Marque l'agent comme supprimé en changeant son statut meta à 'trashed'.
+- **`save()`** — Persiste l'état actuel de l'agent sur le disque.
 
 ### `lib/llm/providers.js`
 
@@ -357,41 +325,32 @@ Ce fichier contient un ensemble complet d'utilitaires pour le traitement de text
 
 #### Traitement de documents PDF
 
-**`getPDFImages(pdfPath)`** - Convertit les pages d'un PDF en images base64 pour l'OCR avec des options optimisées pour la qualité du texte.
-
-**`OCR_SYSTEM_PROMPT`** - Prompt système spécialisé pour guider les modèles multimodaux dans l'extraction de texte à partir d'images.
+- **`getPDFImages(pdfPath)`** — Convertit les pages d'un PDF en images base64 pour l'OCR avec des options optimisées pour la qualité du texte.
+- **`OCR_SYSTEM_PROMPT`** — Prompt système spécialisé pour guider les modèles multimodaux dans l'extraction de texte à partir d'images.
 
 #### Traitement de texte et HTML
 
-**`cleanHtmlContent(html)`** - Nettoie le contenu HTML en supprimant les balises et en normalisant les espaces.
-
-**`simplifyHtml(html)`** - Simplifie le HTML en gardant uniquement les éléments sûrs via sanitize-html.
-
-**`extractTitlesAndContent(html)`** - Extrait intelligemment les titres et le contenu d'un document HTML en préservant la structure.
-
-**`html2chunks(html, chunkSize, chunkOverlap)`** - Découpe un document HTML en chunks en utilisant RecursiveCharacterTextSplitter de LangChain.
+- **`cleanHtmlContent(html)`** — Nettoie le contenu HTML en supprimant les balises et en normalisant les espaces.
+- **`simplifyHtml(html)`** — Simplifie le HTML en gardant uniquement les éléments sûrs via sanitize-html.
+- **`extractTitlesAndContent(html)`** — Extrait intelligemment les titres et le contenu d'un document HTML en préservant la structure.
+- **`html2chunks(html, chunkSize=300, chunkOverlap=0)`** — Découpe un document HTML en chunks en utilisant RecursiveCharacterTextSplitter de LangChain.
 
 #### Gestion des tokens et découpage
 
-**`estimateTokenCount(text)`** - Estime le nombre de tokens d'un texte (approximation basée sur les mots × 1.33).
-
-**`splitLongText(text, maxLength, baseId)`** - Découpe un texte long en segments de taille maximale en préservant les mots entiers.
-
-**`sliceText(text, chunkSize)`** - Découpe un texte en chunks en respectant les limites de phrases.
-
-**`groupSentences(text, maxSize)`** - Groupe les phrases en chunks de taille optimale pour les modèles de langage.
+- **`estimateTokenCount(text)`** — Estime le nombre de tokens d'un texte (approximation basée sur les mots × 1.33).
+- **`splitLongText(text, maxLength, baseId)`** — Découpe un texte long en segments de taille maximale en préservant les mots entiers.
+- **`sliceText(text, chunkSize)`** — Découpe un texte en chunks en respectant les limites de phrases.
+- **`groupSentences(text, maxSize)`** — Groupe les phrases en chunks de taille optimale pour les modèles de langage.
 
 #### Traitement par lots et optimisation
 
-**`chunkArray(array, size)`** - Divise un tableau en sous-tableaux de taille spécifiée pour le traitement par lots.
-
-**`embedChunksInBatch(agent, allChunks, batchSize)`** - Traite les embeddings par lots en associant chaque embedding à son contenu d'origine.
-
-**`buildPromptFromArticlesMulti(initialQuestion, questionsWithArticles, maxTotalTokens)`** - Construit des prompts optimisés à partir de multiples articles en respectant les limites de tokens.
+- **`chunkArray(array, size)`** — Divise un tableau en sous-tableaux de taille spécifiée pour le traitement par lots.
+- **`embedChunksInBatch(agent, allChunks, batchSize=50)`** — Traite les embeddings par lots en associant chaque embedding à son contenu d'origine.
+- **`buildPromptFromArticlesMulti(initialQuestion, questionsWithArticles, maxTotalTokens)`** — Construit des prompts optimisés à partir de multiples articles en respectant les limites de tokens.
 
 #### Utilitaires de conversion
 
-**`vectorToSqlLiteral(vec)`** - Convertit un vecteur Float32Array en littéral SQL hexadécimal pour le stockage en base de données.
+- **`vectorToSqlLiteral(vec)`** — Convertit un vecteur Float32Array en littéral SQL hexadécimal pour le stockage en base de données.
 
 Ces utilitaires sont essentiels pour préparer les données avant de les envoyer aux modèles de langage et pour traiter les résultats. Ils permettent notamment de gérer les contraintes de taille de contexte des modèles en découpant intelligemment les textes longs tout en préservant la cohérence sémantique.
 
