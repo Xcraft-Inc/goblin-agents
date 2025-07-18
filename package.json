@@ -2,7 +2,12 @@
   "name": "goblin-agents",
   "version": "1.0.3",
   "description": "AI Agents framework",
-  "author": "Samuel Loup",
+  "author": "Epsitec SA",
+  "contributors": [
+    "Samuel Loup <loup@epsitec.ch>",
+    "Mathieu Schroeter <schroeter@epsitec.ch>",
+    "Yannick Vessaz <vessaz@epsitec.ch>"
+  ],
   "license": "MIT",
   "config": {
     "xcraft": {
