@@ -270,6 +270,7 @@ L'état de l'agent est défini par `AiAgentShape` :
 - **`addToolMessage(contextId, toolId, toolName, answer)`** — Ajoute un message de résultat d'outil dans l'historique d'un contexte.
 - **`ask(contextId, question, questionId)`** — Pose une question avec streaming (Ollama uniquement). Émet des événements `<questionId>` pour chaque fragment de réponse.
 - **`resumeExchange(resumePrompt, contextId)`** — Reprend un échange existant avec un nouveau prompt système pour générer un résumé ou une synthèse de la conversation.
+- **`generateConversationTitle(contextId)`** — Génère et retourne un titre court dans la langue de la conversation avec le modèle courant, sans modifier ni persister l'historique.
 - **`react(reactPrompt, contextId, question)`** — Paradigme ReAct : le modèle produit une observation, une pensée, une action et un résultat structurés (JSON). Peut déléguer à un autre agent via `callAgent`.
 - **`callAgent(contextId, agentId, action, feedId)`** — Instancie et interroge un autre agent `AiAgent` pour une action dans un workflow multi-agents.
 - **`addAssistantMessage(contextId, message)`** — Ajoute directement un message assistant dans l'historique d'un contexte.
