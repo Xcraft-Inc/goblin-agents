@@ -354,7 +354,7 @@ Ensemble complet d'utilitaires pour le traitement de texte, HTML et documents.
 **Traitement par lots et embeddings :**
 
 - **`chunkArray(array, size)`** — Divise un tableau en sous-tableaux de taille fixe.
-- **`embedChunksInBatch(agent, allChunks, batchSize=50, prefix='passage: ')`** — Traite les embeddings par lots et retourne une map `{ [contentId]: { [key]: { chunk, embedding } } }`.
+- **`embedChunksInBatch(agent, allChunks, batchSize=50, prefix='passage: ')`** — Traite les embeddings par lots et retourne une map `{ [contentId]: { [key]: embedding } }`.
 - **`buildPromptFromArticlesMulti(articles, format='text', maxTotalTokens, dbg)`** — Construit un prompt multi-articles optimisé en respectant une limite de tokens (avec buffer de 16 000 tokens pour l'instruction et la réponse).
 
 **Utilitaires divers :**
